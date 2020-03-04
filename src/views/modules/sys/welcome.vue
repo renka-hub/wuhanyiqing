@@ -454,7 +454,7 @@ export default {
     },
     // 查询
     search() {
-      if (this.value != '' && this.value1 != '') {
+      // if (this.value != '' && this.value1 != '') {
         this.$http({
           url: this.$http.adornUrl(`/dataInto/pageList?keepStatusCd=${this.value}&submitDate=${this.value1}`),
           method: 'get',
@@ -463,12 +463,12 @@ export default {
           // console.log(res)
           this.tableData = res.data.page.list;
         })
-      } else {
-        this.$message({
-          message: '请选择查询条件',
-          type: 'info'
-        });
-      }
+      // } else {
+      //   this.$message({
+      //     message: '请选择查询条件',
+      //     type: 'info'
+      //   });
+      // }
 
     },
     //记录状态
@@ -495,14 +495,17 @@ export default {
 
     //详情
     handleClick(id) {
-      this.dialogTableVisible3 = true;
+      
       this.$http({
         url: this.$http.adornUrl('/dataInto/info/' + id),
         method: 'get',
 
       }).then(res => {
-        // console.log(res)
-        this.info = res.data.t01DetainedPersonInfo;
+        if (!res.data.code) {
+          this.dialogTableVisible3 = true;
+          this.info = res.data.t01DetainedPersonInfo;
+        }
+       
       })
     },
     handleSelectionChange(val) {
@@ -547,9 +550,9 @@ export default {
               message: '新增成功',
               type: 'success'
             });
-            // this.dialogTableVisible2 = false
-            // this.form2 = JSON.parse(JSON.stringify(this.form))
-            // this.getData();
+            this.dialogTableVisible2 = false
+            this.form2 = JSON.parse(JSON.stringify(this.form))
+            this.getData();
           } else {
             this.$message({
               message: '新增失败',

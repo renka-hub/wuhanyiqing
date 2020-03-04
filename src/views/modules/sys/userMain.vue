@@ -86,7 +86,7 @@ export default {
   methods: {
     // 查询
     doModelManageList() {
-      if (this.value != '' && this.value1 != '') {
+      // if (this.value != '' && this.value1 != '') {
         this.$http({
           url: this.$http.adornUrl(`/dataInto/pageList?keepStatusCd=${this.value}&submitDate=${this.value1}`),
           method: 'get',
@@ -95,12 +95,12 @@ export default {
           // console.log(res)
           this.tableData = res.data.page.list;
         })
-      } else {
-        this.$message({
-          message: '请选择查询条件',
-          type: 'info'
-        });
-      }
+      // } else {
+      //   this.$message({
+      //     message: '请选择查询条件',
+      //     type: 'info'
+      //   });
+      // }
     },
     //记录状态
     recordStatus() {
