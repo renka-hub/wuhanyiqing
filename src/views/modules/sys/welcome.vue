@@ -397,7 +397,7 @@ export default {
         url: this.$http.adornUrl('/dataInto/pageList'),
         method: 'get',
       }).then(res => {
-        // console.log(res)
+        console.log(res)
         this.tableData = res.data.page.list;
       })
     },
