@@ -23,7 +23,9 @@
     <div class="Detail">
       <p class="DetailTab"><span>武汉</span>区当日新增滞汉外地人明细反馈表</p>
       <el-table ref="multipleTable" :data="tableData" tooltip-effect="dark" border style="width: 100%" @selection-change="handleSelectionChange">
-        <el-table-column type="selection" width="55">
+        <!-- <el-table-column type="selection" width="55">
+        </el-table-column> -->
+        <el-table-column  label="选择">
         </el-table-column>
         <el-table-column prop="id" label="序号" width="120">
 
@@ -430,7 +432,7 @@ export default {
             message: '修改成功',
             type: 'success'
           });
-          this.dialogTableVisible2 = false
+          this.dialogTableVisible1 = false
           this.form1 = JSON.parse(JSON.stringify(this.form))
           this.getData();
         } else {
