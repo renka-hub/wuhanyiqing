@@ -110,12 +110,13 @@ export default {
       }).then(res => {
         // console.log(res)
         this.options = res.data.data;
+        this.value = this.options[1].keepStatusCd
       })
     },
     // 获取数据
     getData() {
       this.$http({
-        url: this.$http.adornUrl(`/dataInto/pageList?keepStatusCd=${2}`),
+        url: this.$http.adornUrl(`/dataInto/pageList?keepStatusCd=${this.value}`),
         method: 'get',
       }).then(res => {
         console.log(res)
@@ -123,7 +124,7 @@ export default {
         // console.log(this.tableData)
       })
     },
-  
+
     //退回
     goBack() {
       if (this.multipleSelection.length != 1) {
@@ -160,7 +161,12 @@ export default {
     }
   },
   mounted() {
-
+    this.$http({
+      url: this.$http.adornUrl(`/outsider/excel/export`),
+      method: 'get',
+    }).then(res => {
+      console.log(res)
+    })
   }
 
 }

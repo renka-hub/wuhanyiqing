@@ -111,11 +111,11 @@
             <tr>
               <td>救助开始日期</td>
               <td>
-                <el-date-picker v-model="form1.salveDateStat" type="date" value-format="yyyy-MM-dd" placeholder="选择日期"></el-date-picker>
+                <el-date-picker v-model="form1.salveDateStat" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期"></el-date-picker>
               </td>
               <td>救助结束日期</td>
               <td>
-                <el-date-picker v-model="form1.salveDateEnd" type="date" value-format="yyyy-MM-dd" placeholder="选择日期"></el-date-picker>
+                <el-date-picker v-model="form1.salveDateEnd" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期"></el-date-picker>
               </td>
             </tr>
             <tr>
@@ -144,7 +144,10 @@
             <tr>
               <td>行政区</td>
               <td colspan="4">
-                <el-input v-model="form1.areaDesc"></el-input>
+                <el-select v-model="form1.areaDesc" placeholder="请选择">
+                  <el-option v-for="item in areaArr" :key="item.orgId" :label="item.name" :value="item.orgId">
+                  </el-option>
+                </el-select>
               </td>
             </tr>
             <tr>
@@ -206,11 +209,11 @@
             <tr>
               <td>救助开始日期</td>
               <td>
-                <el-date-picker v-model="form2.salveDateStat" type="date" value-format="yyyy-MM-dd" placeholder="选择日期"></el-date-picker>
+                <el-date-picker v-model="form2.salveDateStat" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期"></el-date-picker>
               </td>
               <td>救助结束日期</td>
               <td>
-                <el-date-picker v-model="form2.salveDateEnd" type="date" value-format="yyyy-MM-dd" placeholder="选择日期"></el-date-picker>
+                <el-date-picker v-model="form2.salveDateEnd" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期"></el-date-picker>
               </td>
             </tr>
             <tr>
@@ -220,7 +223,7 @@
               </td>
               <td>户籍地</td>
               <td>
-                <el-select v-model="form1.placeAreaCd" placeholder="请选择">
+                <el-select v-model="form2.placeAreaCd" placeholder="请选择">
                   <el-option v-for="item in cityArr" :key="item.areaCd" :label="item.areaDesc" :value="item.areaCd">
                   </el-option>
                 </el-select>
@@ -239,7 +242,10 @@
             <tr>
               <td>行政区</td>
               <td colspan="4">
-                <el-input v-model="form2.areaDesc"></el-input>
+                <el-select v-model="form2.areaDesc" placeholder="请选择">
+                  <el-option v-for="item in areaArr" :key="item.orgId" :label="item.name" :value="item.orgId">
+                  </el-option>
+                </el-select>
               </td>
             </tr>
             <tr>
@@ -412,13 +418,15 @@ export default {
         value: 7,
         label: '其他人员'
       }],
-      cityArr:[],
+      cityArr: [], //户籍
+      areaArr: [], //区域
     }
   },
   created() {
     this.recordStatus();
     this.getData();
     this.getCity();
+    this.areaDesc();
   },
   components: {
   },
@@ -471,12 +479,13 @@ export default {
       }).then(res => {
         // console.log(res)
         this.options = res.data.data;
+        this.value = this.options[0].keepStatusCd
       })
     },
     // 获取数据
     getData() {
       this.$http({
-        url: this.$http.adornUrl(`/dataInto/pageList?keepStatusCd=${1}`),
+        url: this.$http.adornUrl(`/dataInto/pageList?keepStatusCd=${this.value}`),
         method: 'get',
       }).then(res => {
         console.log(res)
@@ -508,7 +517,7 @@ export default {
         method: 'post',
         data: this.$http.adornData(this.form1)
       }).then(res => {
-        if (!res.code) {
+        if (!res.data.code) {
           this.$message({
             message: '修改成功',
             type: 'success'
@@ -528,26 +537,35 @@ export default {
     //新增保存按钮
     saveNew() {
       console.log(this.form2)
-      this.$http({
-        url: this.$http.adornUrl('/dataInto/save'),
-        method: 'post',
-        data: this.$http.adornData(this.form2)
-      }).then(res => {
-        if (!res.code) {
-          this.$message({
-            message: '新增成功',
-            type: 'success'
-          });
-          this.dialogTableVisible2 = false
-          this.form2 = JSON.parse(JSON.stringify(this.form))
-          this.getData();
-        } else {
-          this.$message({
-            message: '新增失败',
-            type: 'error'
-          });
-        }
-      })
+
+      if (this.form2.detainedName != "" && this.form2.cardNumber != "" && this.form2.telephone != "" && this.form2.address != "" && this.form2.resetMode != "") {
+        this.$http({
+          url: this.$http.adornUrl('/dataInto/save'),
+          method: 'post',
+          data: this.$http.adornData(this.form2)
+        }).then(res => {
+          if (!res.data.code) {
+            this.$message({
+              message: '新增成功',
+              type: 'success'
+            });
+            // this.dialogTableVisible2 = false
+            // this.form2 = JSON.parse(JSON.stringify(this.form))
+            // this.getData();
+          } else {
+            this.$message({
+              message: '新增失败',
+              type: 'error'
+            });
+          }
+        })
+      } else {
+        this.$message({
+          message: '请完整填写表格',
+          type: 'error'
+        });
+      }
+
     },
     //提交
     submit() {
@@ -569,16 +587,24 @@ export default {
         })
       }
     },
-      //户籍
+    //户籍
     getCity() {
       this.$http({
         url: this.$http.adornUrl(`/base/area/getData`),
         method: 'get',
       }).then(res => {
         console.log(res)
-        this.cityArr=res.data.data
-        // this.tableData = res.data.page.list;
-        // console.log(this.tableData)
+        this.cityArr = res.data.data
+      })
+    },
+    //区域
+    areaDesc() {
+      this.$http({
+        url: this.$http.adornUrl(`/base/wuhanArea/getData`),
+        method: 'get',
+      }).then(res => {
+        console.log(res)
+        this.areaArr = res.data.data
       })
     },
     //身份证校验
@@ -603,14 +629,14 @@ export default {
     },
     //金额校验
     isRealNum(val) {
-       const regPNum = /^(([1-9]\d*)|\d)(\.\d{1,2})?$/;
+      const regPNum = /^(([1-9]\d*)|\d)(\.\d{1,2})?$/;
       if (!regPNum.test(val)) {
         this.$message.error('金额格式有误');
         return false;
       } else {
         return true;
       }
-      
+
     },
 
   },
@@ -645,7 +671,8 @@ export default {
 .tableList1 {
   border: 1px solid #ddd;
   width: 100%;
-  /deep/ .el-date-editor.el-input[data-v-78b3a16e], .el-date-editor.el-input__inner[data-v-78b3a16e] {
+  /deep/ .el-date-editor.el-input[data-v-78b3a16e],
+  .el-date-editor.el-input__inner[data-v-78b3a16e] {
     width: 100%;
   }
   td {
