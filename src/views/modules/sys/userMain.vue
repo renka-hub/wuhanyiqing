@@ -80,7 +80,7 @@ export default {
       this.$http({
         url: this.$http.adornUrl(`/dataInto/pageList?keepStatusCd=${this.value}&submitDate=${this.value1}`),
         method: 'get',
-       
+
       }).then(res => {
         console.log(res)
         this.tableData = res.data.page.list;
@@ -115,17 +115,24 @@ export default {
           type: 'info'
         });
       } else {
-        console.log(this.multipleSelection[0].keepStatusCd)
-        this.$http({
-          url: this.$http.adornUrl(`/dataInto/updateStatus/${this.multipleSelection[0].id}?keepStatusCd=${3}`),
-          method: 'post'
-        }).then(res => {
+        if (this.multipleSelection[0].keepStatusCd == 2) {
+          this.$http({
+            url: this.$http.adornUrl(`/dataInto/updateStatus/${this.multipleSelection[0].id}?keepStatusCd=${this.multipleSelection[0].keepStatusCd}`),
+            method: 'post'
+          }).then(res => {
+            this.$message({
+              message: '退回成功',
+              type: 'success'
+            });
+            this.getData();
+          })
+        }
+        else {
           this.$message({
-            message: '退回成功',
-            type: 'success'
+            message: '请选择提交状态的数据，才可以退回！',
+            type: 'info'
           });
-          this.getData();
-        })
+        }
       }
 
     },

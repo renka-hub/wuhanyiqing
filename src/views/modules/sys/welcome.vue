@@ -23,14 +23,12 @@
     <div class="Detail">
       <p class="DetailTab"><span>武汉</span>区当日新增滞汉外地人明细反馈表</p>
       <el-table ref="multipleTable" :data="tableData" tooltip-effect="dark" border style="width: 100%" @selection-change="handleSelectionChange">
-        <!-- <el-table-column type="selection" width="55">
-        </el-table-column> -->
-        <el-table-column  label="选择">
+        <el-table-column type="selection" width="55" >
         </el-table-column>
         <el-table-column prop="id" label="序号" width="120">
 
         </el-table-column>
-        <el-table-column prop="detainedName" label="姓名" width="120">
+        <el-table-column prop="detainedName" label="姓名" width="120" >
           <template slot-scope="scope">
             <a @click="toDetail(scope.row.id)" href="javascript:void(null)">
               {{scope.row.detainedName}}
@@ -476,7 +474,7 @@ export default {
         });
       } else {
         this.$http({
-          url: this.$http.adornUrl(`/dataInto/updateStatus/${this.multipleSelection[0].id}?keepStatusCd=${2}`),
+          url: this.$http.adornUrl(`/dataInto/updateStatus/${this.multipleSelection[0].id}?keepStatusCd=${this.multipleSelection[0].keepStatusCd}`),
           method: 'post'
         }).then(res => {
           this.$message({
