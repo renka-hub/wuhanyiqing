@@ -161,12 +161,7 @@ export default {
     }
   },
   mounted() {
-    this.$http({
-      url: this.$http.adornUrl(`/outsider/excel/export`),
-      method: 'get',
-    }).then(res => {
-      console.log(res)
-    })
+    
   }
 
 }

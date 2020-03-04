@@ -460,7 +460,7 @@ export default {
           method: 'get',
 
         }).then(res => {
-          console.log(res)
+          // console.log(res)
           this.tableData = res.data.page.list;
         })
       } else {
@@ -488,14 +488,13 @@ export default {
         url: this.$http.adornUrl(`/dataInto/pageList?keepStatusCd=${this.value}`),
         method: 'get',
       }).then(res => {
-        console.log(res)
+        // console.log(res)
         this.tableData = res.data.page.list;
       })
     },
 
     //详情
     handleClick(id) {
-      console.log(id)
       this.dialogTableVisible3 = true;
       this.$http({
         url: this.$http.adornUrl('/dataInto/info/' + id),
@@ -536,7 +535,6 @@ export default {
 
     //新增保存按钮
     saveNew() {
-      console.log(this.form2)
 
       if (this.form2.detainedName != "" && this.form2.cardNumber != "" && this.form2.telephone != "" && this.form2.address != "" && this.form2.resetMode != "") {
         this.$http({
@@ -593,7 +591,7 @@ export default {
         url: this.$http.adornUrl(`/base/area/getData`),
         method: 'get',
       }).then(res => {
-        console.log(res)
+        // console.log(res)
         this.cityArr = res.data.data
       })
     },
@@ -603,7 +601,7 @@ export default {
         url: this.$http.adornUrl(`/base/wuhanArea/getData`),
         method: 'get',
       }).then(res => {
-        console.log(res)
+        // console.log(res)
         this.areaArr = res.data.data
       })
     },
