@@ -17,34 +17,43 @@
       <el-button type="primary" @click="goBack()">退回</el-button>
     </div>
     <div class="Detail">
-      <p class="DetailTab"><span>武汉</span>区当日新增滞汉外地人明细反馈表</p>
+      <p class="DetailTab">滞汉外地人清单</p>
       <el-table ref="multipleTable" :data="tableData" tooltip-effect="dark" border style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55">
         </el-table-column>
-        <el-table-column prop="id" label="序号" width="120">
+        <el-table-column prop="areaDesc" label="行政区">
+        </el-table-column>
+        <el-table-column prop="id" label="序号">
+        </el-table-column>
 
-        </el-table-column>
-        <el-table-column prop="areaCd" label="区县" width="120">
-        </el-table-column>
-        <el-table-column prop="detainedName" label="姓名" width="120">
+        <el-table-column prop="detainedName" label="姓名">
         </el-table-column>
         <el-table-column prop="telephone" label="电话">
         </el-table-column>
         <el-table-column prop="cardNumber" label="身份证号">
         </el-table-column>
-        <el-table-column prop="detainedPersonTypeCd" label="滞留人员类型">
+        <el-table-column prop="placeAreaCd" label="户籍地">
         </el-table-column>
         <el-table-column prop="address" label="当地居住地址" show-overflow-tooltip>
         </el-table-column>
-        <el-table-column prop="appealChannelCd" label="诉求类型">
+        <el-table-column prop="detainedPersonTypeDesc" label="滞留人员类型">
         </el-table-column>
+
+        <!-- <el-table-column prop="appealChannelCd" label="诉求类型">
+        </el-table-column> -->
         <el-table-column prop="resetMode" label="安置方式">
         </el-table-column>
-        <el-table-column prop="destCity" label="目的城市">
+        <el-table-column prop="salveAmount" label="救助金额">
         </el-table-column>
-        <el-table-column prop="detainedInfo" label="详情">
+        <el-table-column prop="salveDateStat" label="救助开始日期">
         </el-table-column>
-        <el-table-column prop="bz" label="备注">
+        <el-table-column prop="salveDateEnd" label="救助结束日期">
+        </el-table-column>
+        <el-table-column prop="reviewUser" label="经办人">
+        </el-table-column>
+        <el-table-column prop="orderName" label="负责人">
+        </el-table-column>
+        <el-table-column prop="keepstatusDesc" label="记录状态">
         </el-table-column>
 
       </el-table>
@@ -77,14 +86,21 @@ export default {
   methods: {
     // 查询
     doModelManageList() {
-      this.$http({
-        url: this.$http.adornUrl(`/dataInto/pageList?keepStatusCd=${this.value}&submitDate=${this.value1}`),
-        method: 'get',
+      if (this.value != '' && this.value1 != '') {
+        this.$http({
+          url: this.$http.adornUrl(`/dataInto/pageList?keepStatusCd=${this.value}&submitDate=${this.value1}`),
+          method: 'get',
 
-      }).then(res => {
-        console.log(res)
-        this.tableData = res.data.page.list;
-      })
+        }).then(res => {
+          // console.log(res)
+          this.tableData = res.data.page.list;
+        })
+      } else {
+        this.$message({
+          message: '请选择查询条件',
+          type: 'info'
+        });
+      }
     },
     //记录状态
     recordStatus() {
@@ -99,14 +115,15 @@ export default {
     // 获取数据
     getData() {
       this.$http({
-        url: this.$http.adornUrl('/dataInto/pageList'),
+        url: this.$http.adornUrl(`/dataInto/pageList?keepStatusCd=${2}`),
         method: 'get',
       }).then(res => {
-        // console.log(res)
+        console.log(res)
         this.tableData = res.data.page.list;
         // console.log(this.tableData)
       })
     },
+  
     //退回
     goBack() {
       if (this.multipleSelection.length != 1) {
@@ -139,7 +156,7 @@ export default {
 
     handleSelectionChange(val) {
       this.multipleSelection = val;
-      console.log(this.multipleSelection)
+      // console.log(this.multipleSelection)
     }
   },
   mounted() {

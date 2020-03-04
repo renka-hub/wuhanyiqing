@@ -14,45 +14,56 @@
     </div>
     <div class="block">
       <el-button type="primary" @click="search">查询</el-button>
-      <el-button type="primary" @click="handleUpdate">修改</el-button>
       <el-button type="primary" @click="dialogTableVisible2 = true">新增</el-button>
       <el-button type="primary">数据导入</el-button>
       <el-button type="primary">数据导出</el-button>
       <el-button type="primary" @click="submit">提交</el-button>
     </div>
     <div class="Detail">
-      <p class="DetailTab"><span>武汉</span>区当日新增滞汉外地人明细反馈表</p>
+      <p class="DetailTab">滞汉外地人清单</p>
       <el-table ref="multipleTable" :data="tableData" tooltip-effect="dark" border style="width: 100%" @selection-change="handleSelectionChange">
-        <el-table-column type="selection" width="55" >
+        <el-table-column type="selection" width="55">
         </el-table-column>
-        <el-table-column prop="id" label="序号" width="120">
-
+        <el-table-column prop="areaDesc" label="行政区">
         </el-table-column>
-        <el-table-column prop="detainedName" label="姓名" width="120" >
-          <template slot-scope="scope">
-            <a @click="toDetail(scope.row.id)" href="javascript:void(null)">
-              {{scope.row.detainedName}}
-            </a>
-          </template>
+        <el-table-column prop="id" label="序号">
         </el-table-column>
-        <el-table-column prop="telephone" label="电话">
+        <el-table-column prop="detainedName" label="姓名">
+        </el-table-column>
+        <el-table-column prop="telephone" label="电话" width="110">
         </el-table-column>
         <el-table-column prop="cardNumber" label="身份证号">
         </el-table-column>
-        <el-table-column prop="detainedPersonTypeCd" label="滞留人员类型">
+        <el-table-column prop="placeAreaCd" label="户籍地">
         </el-table-column>
-        <el-table-column prop="address" label="当地居住地址" show-overflow-tooltip>
+        <el-table-column prop="address" label="当地居住地址" show-overflow-tooltip width="110">
         </el-table-column>
-        <el-table-column prop="appealChannelCd" label="诉求类型">
+        <el-table-column prop="detainedPersonTypeDesc" label="滞留人员类型" width="110">
         </el-table-column>
         <el-table-column prop="resetMode" label="安置方式">
         </el-table-column>
-        <el-table-column prop="destCity" label="目的城市">
+        <el-table-column prop="salveAmount" label="救助金额">
         </el-table-column>
-        <el-table-column prop="detainedInfo" label="详情">
+        <el-table-column prop="salveDateStat" label="救助开始日期" width="105">
         </el-table-column>
-        <el-table-column prop="bz" label="备注">
+        <el-table-column prop="salveDateEnd" label="救助结束日期" width="105">
         </el-table-column>
+        <el-table-column prop="reviewUser" label="经办人">
+        </el-table-column>
+        <el-table-column prop="orderName" label="负责人">
+        </el-table-column>
+        <el-table-column prop="keepstatusDesc" label="记录状态">
+        </el-table-column>
+        <!-- <el-table-column prop="bz" label="操作">
+          <a href="">详细</a>
+        </el-table-column> -->
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <el-button @click="handleClick(scope.row.id)" type="text" size="small">详细</el-button>
+            <el-button type="text" size="small" @click="handleUpdate(scope.row)">修改</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
 
       </el-table>
     </div>
@@ -62,7 +73,7 @@
         <table border class="tableList1">
           <tbody>
             <tr>
-              <td style="text-align:center;" colspan="4">XX区当日新增滞汉外地人明细</td>
+              <td style="text-align:center;" colspan="4">滞汉外地人修改</td>
             </tr>
             <tr>
               <td>姓名</td>
@@ -71,13 +82,13 @@
               </td>
               <td>身份证号</td>
               <td>
-                <el-input v-model="form1.cardNumber"></el-input>
+                <el-input v-model="form1.cardNumber" @blur="checkIdCard(form1.cardNumber)"></el-input>
               </td>
             </tr>
             <tr>
               <td>电话</td>
               <td>
-                <el-input v-model="form1.telephone"></el-input>
+                <el-input v-model="form1.telephone" @blur="phoneNumber(form1.telephone)"></el-input>
               </td>
               <td>当地居住地址</td>
               <td>
@@ -87,33 +98,53 @@
             <tr>
               <td>滞留人员类型</td>
               <td>
-                <el-select v-model="form1.DetainedPersonTypeCd" placeholder="请选择">
+                <el-select v-model="form1.detainedPersonTypeDesc" placeholder="请选择">
                   <el-option v-for="item in types" :key="item.value" :label="item.label" :value="item.value">
                   </el-option>
                 </el-select>
               </td>
-              <td>诉求类型</td>
+              <td>安置方式</td>
               <td>
-                <el-select v-model="form1.appealTypeCd" placeholder="请选择">
-                  <el-option v-for="item in Appeals" :key="item.value" :label="item.label" :value="item.value">
+                <el-input v-model="form1.resetMode"></el-input>
+              </td>
+            </tr>
+            <tr>
+              <td>救助开始日期</td>
+              <td>
+                <el-date-picker v-model="form1.salveDateStat" type="date" value-format="yyyy-MM-dd" placeholder="选择日期"></el-date-picker>
+              </td>
+              <td>救助结束日期</td>
+              <td>
+                <el-date-picker v-model="form1.salveDateEnd" type="date" value-format="yyyy-MM-dd" placeholder="选择日期"></el-date-picker>
+              </td>
+            </tr>
+            <tr>
+              <td>救助金额</td>
+              <td>
+                <el-input v-model="form1.salveAmount" @blur="isRealNum(form1.salveAmount)"></el-input>
+              </td>
+              <td>户籍地</td>
+              <td>
+                <el-select v-model="form1.placeAreaCd" placeholder="请选择">
+                  <el-option v-for="item in types" :key="item.value" :label="item.label" :value="item.value">
                   </el-option>
                 </el-select>
               </td>
             </tr>
             <tr>
-              <td>安置方式</td>
+              <td>经办人</td>
               <td>
-                <el-input v-model="form1.resetMode"></el-input>
+                <el-input v-model="form1.reviewUser"></el-input>
               </td>
-              <td>目的城市</td>
+              <td>负责人</td>
               <td>
-                <el-input v-model="form1.destCity"></el-input>
+                <el-input v-model="form1.orderName"></el-input>
               </td>
             </tr>
             <tr>
-              <td>详情</td>
+              <td>行政区</td>
               <td colspan="4">
-                <el-input v-model="form1.detainedInfo"></el-input>
+                <el-input v-model="form1.areaDesc"></el-input>
               </td>
             </tr>
             <tr>
@@ -137,7 +168,7 @@
         <table border class="tableList1">
           <tbody>
             <tr>
-              <td style="text-align:center;" colspan="4">XX区当日新增滞汉外地人明细</td>
+              <td style="text-align:center;" colspan="4">滞汉外地人新增</td>
             </tr>
             <tr>
               <td>姓名</td>
@@ -146,13 +177,13 @@
               </td>
               <td>身份证号</td>
               <td>
-                <el-input v-model="form2.cardNumber"></el-input>
+                <el-input v-model="form2.cardNumber" @blur="checkIdCard(form2.cardNumber)"></el-input>
               </td>
             </tr>
             <tr>
               <td>电话</td>
               <td>
-                <el-input v-model="form2.telephone"></el-input>
+                <el-input v-model="form2.telephone" @blur="phoneNumber(form2.telephone)"></el-input>
               </td>
               <td>当地居住地址</td>
               <td>
@@ -162,33 +193,53 @@
             <tr>
               <td>滞留人员类型</td>
               <td>
-                <el-select v-model="form2.DetainedPersonTypeCd" placeholder="请选择">
+                <el-select v-model="form2.detainedPersonTypeDesc" placeholder="请选择">
                   <el-option v-for="item in types" :key="item.value" :label="item.label" :value="item.value">
                   </el-option>
                 </el-select>
               </td>
-              <td>诉求类型</td>
+              <td>安置方式</td>
               <td>
-                <el-select v-model="form2.appealTypeCd" placeholder="请选择">
-                  <el-option v-for="item in Appeals" :key="item.value" :label="item.label" :value="item.value">
+                <el-input v-model="form2.resetMode"></el-input>
+              </td>
+            </tr>
+            <tr>
+              <td>救助开始日期</td>
+              <td>
+                <el-date-picker v-model="form2.salveDateStat" type="date" value-format="yyyy-MM-dd" placeholder="选择日期"></el-date-picker>
+              </td>
+              <td>救助结束日期</td>
+              <td>
+                <el-date-picker v-model="form2.salveDateEnd" type="date" value-format="yyyy-MM-dd" placeholder="选择日期"></el-date-picker>
+              </td>
+            </tr>
+            <tr>
+              <td>救助金额</td>
+              <td>
+                <el-input v-model="form2.salveAmount" @blur="isRealNum(form2.salveAmount)"></el-input>
+              </td>
+              <td>户籍地</td>
+              <td>
+                <el-select v-model="form1.placeAreaCd" placeholder="请选择">
+                  <el-option v-for="item in cityArr" :key="item.areaCd" :label="item.areaDesc" :value="item.areaCd">
                   </el-option>
                 </el-select>
               </td>
             </tr>
             <tr>
-              <td>安置方式</td>
+              <td>经办人</td>
               <td>
-                <el-input v-model="form2.resetMode"></el-input>
+                <el-input v-model="form2.reviewUser"></el-input>
               </td>
-              <td>目的城市</td>
+              <td>负责人</td>
               <td>
-                <el-input v-model="form2.destCity"></el-input>
+                <el-input v-model="form2.orderName"></el-input>
               </td>
             </tr>
             <tr>
-              <td>详情</td>
+              <td>行政区</td>
               <td colspan="4">
-                <el-input v-model="form2.detainedInfo"></el-input>
+                <el-input v-model="form2.areaDesc"></el-input>
               </td>
             </tr>
             <tr>
@@ -210,7 +261,13 @@
       <table border class="tableList1">
         <tbody>
           <tr>
-            <td style="text-align:center;" colspan="4">武汉区当日新增滞汉外地人明细</td>
+            <td style="text-align:center;" colspan="4">滞汉外地人详细信息</td>
+          </tr>
+          <tr>
+            <td width="15%">序号</td>
+            <td width="35%">{{info.id}}</td>
+            <td width="15%">行政区</td>
+            <td width="35%">{{info.areaDesc}}</td>
           </tr>
           <tr>
             <td width="15%">姓名</td>
@@ -226,9 +283,9 @@
           </tr>
           <tr>
             <td>滞留人员类型</td>
-            <td>{{info.detainedPersonTypeCd}}</td>
-            <td>诉求类型</td>
-            <td>{{info.appealChannelCd}}</td>
+            <td>{{info.detainedPersonTypeDesc}}</td>
+            <td>户籍地</td>
+            <td>{{info.placeAreaCd}}</td>
           </tr>
           <tr>
             <td>安置方式</td>
@@ -237,8 +294,33 @@
             <td>{{info.destCity}}</td>
           </tr>
           <tr>
-            <td>详情</td>
-            <td colspan="4">{{info.detainedInfo}}</td>
+            <td>救助开始日期</td>
+            <td>{{info.salveDateStat}}</td>
+            <td>救助结束日期</td>
+            <td>{{info.salveDateEnd}}</td>
+          </tr>
+          <tr>
+            <td>救助金额</td>
+            <td>{{info.salveAmount}}</td>
+            <td>记录状态</td>
+            <td>{{info.keepstatusDesc}}</td>
+          </tr>
+          <tr>
+            <td>经办人</td>
+            <td>{{info.reviewUser}}</td>
+            <td>负责人</td>
+            <td>{{info.orderName}}</td>
+          </tr>
+          <tr>
+            <td>审核人</td>
+            <td>{{info.orderName}}</td>
+            <td>更新时间</td>
+            <td>{{info.uptDate}}</td>
+          </tr>
+
+          <tr>
+            <td>录入时间</td>
+            <td colspan="4">{{info.submitDate}}</td>
           </tr>
           <tr>
             <td>备注</td>
@@ -280,11 +362,14 @@ export default {
         telephone: "",
         address: "",
         resetMode: "",
-        destCity: "",
-        detainedInfo: "",
+        salveDateStat: "",
+        salveDateEnd: "",
+        salveAmount: "",
+        placeAreaCd: "",
+        orderName: "",
+        areaCd: "",
         bz: "",
-        appealTypeCd: '', //诉求类型
-        DetainedPersonTypeCd: '', //滞留类型
+        detainedPersonTypeDesc: '', //滞留类型
       },
       form2: {
         detainedName: "",
@@ -292,32 +377,15 @@ export default {
         telephone: "",
         address: "",
         resetMode: "",
-        destCity: "",
-        detainedInfo: "",
+        salveDateStat: "",
+        salveDateEnd: "",
+        salveAmount: "",
+        placeAreaCd: "",
+        orderName: "",
+        areaCd: "",
         bz: "",
-        appealTypeCd: '', //诉求类型
-        DetainedPersonTypeCd: '', //滞留类型
+        detainedPersonTypeDesc: '', //滞留类型
       },
-
-      Appeals: [{
-        value: 1,
-        label: '需要离汉'
-      }, {
-        value: 2,
-        label: '生活困难'
-      }, {
-        value: 3,
-        label: '救助居住'
-      }, {
-        value: 4,
-        label: '求助就医买药'
-      }, {
-        value: 5,
-        label: '就业意向'
-      }, {
-        value: 6,
-        label: '其他诉求'
-      }],
 
       types: [{
         value: 0,
@@ -344,17 +412,20 @@ export default {
         value: 7,
         label: '其他人员'
       }],
+      cityArr:[],
     }
   },
   created() {
     this.recordStatus();
     this.getData();
+    this.getCity();
   },
   components: {
   },
   methods: {
     //修改
-    handleUpdate() {
+    handleUpdate(val) {
+      // console.log(val)
       this.dialogTableVisible1 = true;
       let form = {
         detainedName: "",
@@ -362,24 +433,35 @@ export default {
         telephone: "",
         address: "",
         resetMode: "",
-        destCity: "",
-        detainedInfo: "",
+        salveDateStat: "",
+        salveDateEnd: "",
+        salveAmount: "",
+        placeAreaCd: "",
+        orderName: "",
+        areaCd: "",
         bz: "",
-        appealTypeCd: '',
-        DetainedPersonTypeCd: '',
+        detainedPersonTypeDesc: '', //滞留类型
       }
-      this.form1 = this.multipleSelection.length ? this.multipleSelection[0] : form
+      this.form1 = val
     },
     // 查询
     search() {
-      this.$http({
-        url: this.$http.adornUrl(`/dataInto/pageList?keepStatusCd=${this.value}&submitDate=${this.value1}`),
-        method: 'get',
+      if (this.value != '' && this.value1 != '') {
+        this.$http({
+          url: this.$http.adornUrl(`/dataInto/pageList?keepStatusCd=${this.value}&submitDate=${this.value1}`),
+          method: 'get',
 
-      }).then(res => {
-        console.log(res)
-        this.tableData = res.data.page.list;
-      })
+        }).then(res => {
+          console.log(res)
+          this.tableData = res.data.page.list;
+        })
+      } else {
+        this.$message({
+          message: '请选择查询条件',
+          type: 'info'
+        });
+      }
+
     },
     //记录状态
     recordStatus() {
@@ -394,7 +476,7 @@ export default {
     // 获取数据
     getData() {
       this.$http({
-        url: this.$http.adornUrl('/dataInto/pageList'),
+        url: this.$http.adornUrl(`/dataInto/pageList?keepStatusCd=${1}`),
         method: 'get',
       }).then(res => {
         console.log(res)
@@ -403,7 +485,8 @@ export default {
     },
 
     //详情
-    toDetail(id) {
+    handleClick(id) {
+      console.log(id)
       this.dialogTableVisible3 = true;
       this.$http({
         url: this.$http.adornUrl('/dataInto/info/' + id),
@@ -444,6 +527,7 @@ export default {
 
     //新增保存按钮
     saveNew() {
+      console.log(this.form2)
       this.$http({
         url: this.$http.adornUrl('/dataInto/save'),
         method: 'post',
@@ -485,6 +569,50 @@ export default {
         })
       }
     },
+      //户籍
+    getCity() {
+      this.$http({
+        url: this.$http.adornUrl(`/base/area/getData`),
+        method: 'get',
+      }).then(res => {
+        console.log(res)
+        this.cityArr=res.data.data
+        // this.tableData = res.data.page.list;
+        // console.log(this.tableData)
+      })
+    },
+    //身份证校验
+    checkIdCard(idcard) {
+      const regIdCard = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
+      if (!regIdCard.test(idcard)) {
+        this.$message.error('身份证号填写有误');
+        return false;
+      } else {
+        return true;
+      }
+    },
+    //手机号校验
+    phoneNumber(phone) {
+      const regPhone = /^[1][3,4,5,7,8,9][0-9]{9}$/;
+      if (!regPhone.test(phone)) {
+        this.$message.error('手机号填写有误');
+        return false;
+      } else {
+        return true;
+      }
+    },
+    //金额校验
+    isRealNum(val) {
+       const regPNum = /^(([1-9]\d*)|\d)(\.\d{1,2})?$/;
+      if (!regPNum.test(val)) {
+        this.$message.error('金额格式有误');
+        return false;
+      } else {
+        return true;
+      }
+      
+    },
+
   },
   mounted() {
     this.form = JSON.parse(JSON.stringify(this.form1))
@@ -503,8 +631,9 @@ export default {
   display: inline-block;
   margin-left: 30px;
 }
-.el-date-editor.el-input, .el-date-editor.el-input__inner {
-    width: 160px;
+.el-date-editor.el-input,
+.el-date-editor.el-input__inner {
+  width: 160px;
 }
 .Detail {
   margin-top: 50px;
@@ -516,7 +645,9 @@ export default {
 .tableList1 {
   border: 1px solid #ddd;
   width: 100%;
-
+  /deep/ .el-date-editor.el-input[data-v-78b3a16e], .el-date-editor.el-input__inner[data-v-78b3a16e] {
+    width: 100%;
+  }
   td {
     padding: 5px 10px;
     v-deep input {
