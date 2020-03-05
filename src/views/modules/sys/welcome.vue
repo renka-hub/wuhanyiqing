@@ -40,7 +40,7 @@
         </el-table-column>
         <el-table-column prop="detainedPersonTypeDesc" label="滞留人员类型" width="110">
         </el-table-column>
-        <el-table-column prop="resetMode" label="安置方式">
+        <el-table-column prop="resetMode" label="安置方式" show-overflow-tooltip>
         </el-table-column>
         <el-table-column prop="salveAmount" label="救助金额">
         </el-table-column>
@@ -129,16 +129,16 @@
               </td>
             </tr>
             <tr>
-              <td>经办人</td>
+              <!-- <td>经办人</td>
               <td>
                 <el-input v-model="form1.submitUser"></el-input>
-              </td>
+              </td> -->
               <td>负责人</td>
-              <td>
+              <td colspan="4">
                 <el-input v-model="form1.orderName"></el-input>
               </td>
             </tr>
-            <tr>
+            <!-- <tr>
               <td>行政区</td>
               <td colspan="4">
                 <el-select v-model="form1.areaCd" placeholder="请选择">
@@ -146,7 +146,7 @@
                   </el-option>
                 </el-select>
               </td>
-            </tr>
+            </tr> -->
             <tr>
               <td>备注</td>
               <td colspan="4">
@@ -227,16 +227,16 @@
               </td>
             </tr>
             <tr>
-              <td>经办人</td>
+              <!-- <td>经办人</td>
               <td>
                 <el-input v-model="userInfo.username" disabled></el-input>
-              </td>
+              </td> -->
               <td>负责人</td>
-              <td>
+              <td colspan="4">
                 <el-input v-model="form2.orderName"></el-input>
               </td>
             </tr>
-            <tr>
+            <!-- <tr>
               <td>行政区</td>
               <td colspan="4">
                 <template v-if="userInfo.orgIdCode !==420101000000">
@@ -249,7 +249,7 @@
                   <el-input value="武汉市" disabled></el-input>
                 </template>
               </td>
-            </tr>
+            </tr> -->
             <tr>
               <td>备注</td>
               <td colspan="4">
@@ -504,7 +504,6 @@ export default {
 
     //详情
     handleClick(id) {
-
       this.$http({
         url: this.$http.adornUrl('/dataInto/info/' + id),
         method: 'get',
@@ -548,8 +547,8 @@ export default {
     //新增保存按钮
     saveNew() {
       if (this.form2.detainedName != "" && this.form2.cardNumber != "" && this.form2.telephone != "" && this.form2.address != "" && this.form2.resetMode != "") {
-        this.form2.submitUser = this.userInfo.username
-        this.form2.areaCd = this.userInfo.orgIdCode
+        // this.form2.submitUser = this.userInfo.username
+        // this.form2.areaCd = this.userInfo.orgIdCode
         console.log(this.userInfo)
         this.$http({
           url: this.$http.adornUrl('/dataInto/save'),
@@ -588,7 +587,7 @@ export default {
         });
       } else {
         this.$http({
-          url: this.$http.adornUrl(`/dataInto/updateStatus/${this.multipleSelection[0].id}?keepStatusCd=${this.multipleSelection[0].keepStatusCd}`),
+          url: this.$http.adornUrl(`/dataInto/updateStatus/${this.multipleSelection[0].id}?keepStatusCd=${2}`),
           method: 'post'
         }).then(res => {
           this.$message({
