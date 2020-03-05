@@ -7,13 +7,13 @@
     </div>
     <div class="block">
       <span>记录状态：</span>
-      <el-select v-model="value" placeholder="请选择">
+      <el-select v-model="valuel" placeholder="请选择">
         <el-option v-for="item in options" :key="item.keepStatusCd" :label="item.keepStatusDesc" :value="item.keepStatusCd">
         </el-option>
       </el-select>
     </div>
     <div class="block">
-      <el-button type="primary" @click="doModelManageList">查询</el-button>
+      <el-button type="primary" @click="getData">查询</el-button>
       <el-button type="primary" @click="goBack()">退回</el-button>
     </div>
     <div class="Detail">
@@ -32,7 +32,7 @@
         </el-table-column>
         <el-table-column prop="cardNumber" label="身份证号">
         </el-table-column>
-        <el-table-column prop="placeAreaCd" label="户籍地">
+        <el-table-column prop="placeAreaDesc" label="户籍地">
         </el-table-column>
         <el-table-column prop="address" label="当地居住地址" show-overflow-tooltip>
         </el-table-column>
@@ -49,15 +49,16 @@
         </el-table-column>
         <el-table-column prop="salveDateEnd" label="救助结束日期">
         </el-table-column>
-        <el-table-column prop="reviewUser" label="经办人">
+        <el-table-column prop="submitUser" label="经办人">
         </el-table-column>
         <el-table-column prop="orderName" label="负责人">
         </el-table-column>
         <el-table-column prop="keepstatusDesc" label="记录状态">
         </el-table-column>
-
       </el-table>
     </div>
+    <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[10, 20, 30, 50]" :page-size="pageSize" :total="totalCount">
+    </el-pagination>
   </div>
 </template>
 
@@ -72,9 +73,13 @@ export default {
     return {
       value1: '', //填报日期
       options: [], //记录状态
-      value: '',
+      valuel: 2,
       tableData: [], //数据列表
-      multipleSelection: []
+      multipleSelection: [],
+      currentPage: 1, //页数
+      pageSize: 10, //条数
+      pageIndex: 1, //页码
+      totalCount: 0,
     }
   },
   created() {
@@ -85,23 +90,23 @@ export default {
   },
   methods: {
     // 查询
-    doModelManageList() {
-      // if (this.value != '' && this.value1 != '') {
-        this.$http({
-          url: this.$http.adornUrl(`/dataInto/pageList?keepStatusCd=${this.value}&submitDate=${this.value1}`),
-          method: 'get',
+    // doModelManageList() {
+    //   // if (this.value != '' && this.value1 != '') {
+    //     this.$http({
+    //       url: this.$http.adornUrl(`/dataInto/pageList?keepStatusCd=${this.value}&submitDate=${this.value1}`),
+    //       method: 'get',
 
-        }).then(res => {
-          // console.log(res)
-          this.tableData = res.data.page.list;
-        })
-      // } else {
-      //   this.$message({
-      //     message: '请选择查询条件',
-      //     type: 'info'
-      //   });
-      // }
-    },
+    //     }).then(res => {
+    //       // console.log(res)
+    //       this.tableData = res.data.page.list;
+    //     })
+    //   // } else {
+    //   //   this.$message({
+    //   //     message: '请选择查询条件',
+    //   //     type: 'info'
+    //   //   });
+    //   // }
+    // },
     //记录状态
     recordStatus() {
       this.$http({
@@ -110,19 +115,30 @@ export default {
       }).then(res => {
         // console.log(res)
         this.options = res.data.data;
-        this.value = this.options[1].keepStatusCd
+        this.valuel = this.options[1].keepStatusCd
       })
     },
     // 获取数据
     getData() {
       this.$http({
-        url: this.$http.adornUrl(`/dataInto/pageList?keepStatusCd=${this.value}`),
+        url: this.$http.adornUrl(`/dataInto/pageList?keepStatusCd=${this.valuel}&submitDate=${this.value1}&pageIndex=${this.pageIndex}&pageSize=${this.pageSize}`),
         method: 'get',
       }).then(res => {
-        console.log(res)
+        // console.log(res)
         this.tableData = res.data.page.list;
-        // console.log(this.tableData)
+        this.pageSize = res.data.page.pageSize
+        this.totalCount = res.data.page.totalCount
       })
+    },
+    handleSizeChange(val) {
+      this.pageSize = val;
+      // console.log(`每页 ${val} 条`);
+      this.getData();
+    },
+    handleCurrentChange(val) {
+      this.pageIndex = val;
+      // console.log(`当前页: ${val}`);
+      this.getData();
     },
 
     //退回
@@ -161,7 +177,7 @@ export default {
     }
   },
   mounted() {
-    
+
   }
 
 }

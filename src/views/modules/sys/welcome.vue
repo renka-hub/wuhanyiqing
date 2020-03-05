@@ -7,13 +7,13 @@
     </div>
     <div class="block">
       <span>记录状态：</span>
-      <el-select v-model="value" placeholder="请选择">
+      <el-select v-model="valuel" placeholder="请选择">
         <el-option v-for="item in options" :key="item.keepStatusCd" :label="item.keepStatusDesc" :value="item.keepStatusCd">
         </el-option>
       </el-select>
     </div>
     <div class="block">
-      <el-button type="primary" @click="search">查询</el-button>
+      <el-button type="primary" @click="getData">查询</el-button>
       <el-button type="primary" @click="dialogTableVisible2 = true">新增</el-button>
       <el-button type="primary">数据导入</el-button>
       <el-button type="primary">数据导出</el-button>
@@ -65,6 +65,8 @@
         </el-table-column>
       </el-table>
     </div>
+    <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[10, 20, 30, 50]" :page-size="pageSize" :total="totalCount">
+    </el-pagination>
     <!-- 修改弹框 -->
     <el-dialog title="修改" :visible.sync="dialogTableVisible1">
       <el-form ref="form" :model="form1">
@@ -350,7 +352,7 @@ export default {
   data() {
     return {
       value1: '', //填报日期
-      value: '', //记录状态
+      valuel: 1, //记录状态
       options: [], //记录状态
 
       tableData: [], //数据列表
@@ -418,6 +420,10 @@ export default {
       }],
       cityArr: [], //户籍
       areaArr: [], //区域
+      currentPage: 1, //页数
+      pageSize: 10, //条数
+      pageIndex: 1, //页码
+      totalCount: 0,
     }
   },
   created() {
@@ -432,32 +438,32 @@ export default {
     //修改
     handleUpdate(val) {
       // console.log(val)
-      if(val.keepStatusCd != 2) {
+      if (val.keepStatusCd != 2) {
         this.dialogTableVisible1 = true;
         this.form1 = val
-      }else{
+      } else {
         this.$message('不能修改提交状态的数据');
       }
     },
     // 查询
-    search() {
-      // if (this.value != '' && this.value1 != '') {
-        this.$http({
-          url: this.$http.adornUrl(`/dataInto/pageList?keepStatusCd=${this.value}&submitDate=${this.value1}`),
-          method: 'get',
+    // search() {
+    //   // if (this.value != '' && this.value1 != '') {
+    //     this.$http({
+    //       url: this.$http.adornUrl(`/dataInto/pageList?keepStatusCd=${this.value}&submitDate=${this.value1}`),
+    //       method: 'get',
 
-        }).then(res => {
-          // console.log(res)
-          this.tableData = res.data.page.list;
-        })
-      // } else {
-      //   this.$message({
-      //     message: '请选择查询条件',
-      //     type: 'info'
-      //   });
-      // }
+    //     }).then(res => {
+    //       // console.log(res)
+    //       this.tableData = res.data.page.list;
+    //     })
+    //   // } else {
+    //   //   this.$message({
+    //   //     message: '请选择查询条件',
+    //   //     type: 'info'
+    //   //   });
+    //   // }
 
-    },
+    // },
     //记录状态
     recordStatus() {
       this.$http({
@@ -466,23 +472,34 @@ export default {
       }).then(res => {
         // console.log(res)
         this.options = res.data.data;
-        this.value = this.options[0].keepStatusCd
+        this.valuel = this.options[0].keepStatusCd
       })
     },
     // 获取数据
     getData() {
       this.$http({
-        url: this.$http.adornUrl(`/dataInto/pageList?keepStatusCd=${this.value}`),
+        url: this.$http.adornUrl(`/dataInto/pageList?keepStatusCd=${this.valuel}&submitDate=${this.value1}&pageIndex=${this.pageIndex}&pageSize=${this.pageSize}`),
         method: 'get',
       }).then(res => {
-        // console.log(res)
+        console.log(res)
         this.tableData = res.data.page.list;
+        this.pageSize = res.data.page.pageSize
+        this.totalCount = res.data.page.totalCount
       })
     },
-
+    handleSizeChange(val) {
+      this.pageSize = val;
+      // console.log(`每页 ${val} 条`);
+      this.getData();
+    },
+    handleCurrentChange(val) {
+      this.pageIndex = val;
+      // console.log(`当前页: ${val}`);
+      this.getData();
+    },
     //详情
     handleClick(id) {
-      
+
       this.$http({
         url: this.$http.adornUrl('/dataInto/info/' + id),
         method: 'get',
@@ -492,7 +509,7 @@ export default {
           this.dialogTableVisible3 = true;
           this.info = res.data.t01DetainedPersonInfo;
         }
-       
+
       })
     },
     handleSelectionChange(val) {
