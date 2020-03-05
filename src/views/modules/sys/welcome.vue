@@ -34,7 +34,7 @@
         </el-table-column>
         <el-table-column prop="cardNumber" label="身份证号">
         </el-table-column>
-        <el-table-column prop="placeAreaCd" label="户籍地">
+        <el-table-column prop="placeAreaDesc" label="户籍地">
         </el-table-column>
         <el-table-column prop="address" label="当地居住地址" show-overflow-tooltip width="110">
         </el-table-column>
@@ -144,7 +144,7 @@
             <tr>
               <td>行政区</td>
               <td colspan="4">
-                <el-select v-model="form1.areaDesc" placeholder="请选择">
+                <el-select v-model="form1.areaCd" placeholder="请选择">
                   <el-option v-for="item in areaArr" :key="item.orgId" :label="item.name" :value="item.orgId">
                   </el-option>
                 </el-select>
@@ -434,23 +434,12 @@ export default {
     //修改
     handleUpdate(val) {
       // console.log(val)
-      this.dialogTableVisible1 = true;
-      let form = {
-        detainedName: "",
-        cardNumber: "",
-        telephone: "",
-        address: "",
-        resetMode: "",
-        salveDateStat: "",
-        salveDateEnd: "",
-        salveAmount: "",
-        placeAreaCd: "",
-        orderName: "",
-        areaCd: "",
-        bz: "",
-        detainedPersonTypeDesc: '', //滞留类型
+      if(val.keepStatusCd != 2) {
+        this.dialogTableVisible1 = true;
+        this.form1 = val
+      }else{
+        this.$message('不能修改提交状态的数据');
       }
-      this.form1 = val
     },
     // 查询
     search() {
