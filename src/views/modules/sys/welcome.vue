@@ -64,8 +64,6 @@
           </template>
         </el-table-column>
       </el-table>
-
-      </el-table>
     </div>
     <!-- 修改弹框 -->
     <el-dialog title="修改" :visible.sync="dialogTableVisible1">
