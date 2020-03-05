@@ -32,7 +32,7 @@
         </el-table-column>
         <el-table-column prop="telephone" label="电话" width="110">
         </el-table-column>
-        <el-table-column prop="cardNumber" label="身份证号">
+        <el-table-column prop="cardNumber" label="身份证号" show-overflow-tooltip>
         </el-table-column>
         <el-table-column prop="placeAreaDesc" label="户籍地">
         </el-table-column>
@@ -44,19 +44,16 @@
         </el-table-column>
         <el-table-column prop="salveAmount" label="救助金额">
         </el-table-column>
-        <el-table-column prop="salveDateStat" label="救助开始日期" width="105">
+        <el-table-column prop="salveDateStat" label="救助开始日期" width="110" show-overflow-tooltip>
         </el-table-column>
-        <el-table-column prop="salveDateEnd" label="救助结束日期" width="105">
+        <el-table-column prop="salveDateEnd" label="救助结束日期" width="110" show-overflow-tooltip>
         </el-table-column>
-        <el-table-column prop="reviewUser" label="经办人">
+        <el-table-column prop="submitUser" label="经办人">
         </el-table-column>
         <el-table-column prop="orderName" label="负责人">
         </el-table-column>
         <el-table-column prop="keepstatusDesc" label="记录状态">
         </el-table-column>
-        <!-- <el-table-column prop="bz" label="操作">
-          <a href="">详细</a>
-        </el-table-column> -->
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button @click="handleClick(scope.row.id)" type="text" size="small">详细</el-button>
@@ -98,7 +95,7 @@
             <tr>
               <td>滞留人员类型</td>
               <td>
-                <el-select v-model="form1.detainedPersonTypeDesc" placeholder="请选择">
+                <el-select v-model="form1.detainedPersonTypeCd" placeholder="请选择">
                   <el-option v-for="item in types" :key="item.value" :label="item.label" :value="item.value">
                   </el-option>
                 </el-select>
@@ -126,7 +123,7 @@
               <td>户籍地</td>
               <td>
                 <el-select v-model="form1.placeAreaCd" placeholder="请选择">
-                  <el-option v-for="item in types" :key="item.value" :label="item.label" :value="item.value">
+                  <el-option v-for="item in cityArr" :key="item.areaCd" :label="item.areaDesc" :value="item.areaCd">
                   </el-option>
                 </el-select>
               </td>
@@ -134,7 +131,7 @@
             <tr>
               <td>经办人</td>
               <td>
-                <el-input v-model="form1.reviewUser"></el-input>
+                <el-input v-model="form1.submitUser"></el-input>
               </td>
               <td>负责人</td>
               <td>
@@ -196,7 +193,7 @@
             <tr>
               <td>滞留人员类型</td>
               <td>
-                <el-select v-model="form2.detainedPersonTypeDesc" placeholder="请选择">
+                <el-select v-model="form2.detainedPersonTypeCd" placeholder="请选择">
                   <el-option v-for="item in types" :key="item.value" :label="item.label" :value="item.value">
                   </el-option>
                 </el-select>
@@ -232,7 +229,7 @@
             <tr>
               <td>经办人</td>
               <td>
-                <el-input v-model="form2.reviewUser"></el-input>
+                <el-input v-model="userInfo.username" disabled></el-input>
               </td>
               <td>负责人</td>
               <td>
@@ -242,10 +239,15 @@
             <tr>
               <td>行政区</td>
               <td colspan="4">
-                <el-select v-model="form2.areaCd" placeholder="请选择">
-                  <el-option v-for="item in areaArr" :key="item.orgId" :label="item.name" :value="item.orgId">
-                  </el-option>
-                </el-select>
+                <template v-if="userInfo.orgIdCode !==420101000000">
+                  <el-select v-model="userInfo.orgIdCode" placeholder="请选择" disabled>
+                    <el-option v-for="item in areaArr" :key="item.orgId" :label="item.name" :value="item.orgId">
+                    </el-option>
+                  </el-select>
+                </template>
+                <template v-else>
+                  <el-input value="武汉市" disabled></el-input>
+                </template>
               </td>
             </tr>
             <tr>
@@ -262,6 +264,7 @@
         <el-button @click="dialogTableVisible2 = false">放弃</el-button>
       </div>
     </el-dialog>
+
     <!-- 详情弹框 -->
     <el-dialog title="详情" :visible.sync="dialogTableVisible3">
       <table border class="tableList1">
@@ -291,7 +294,7 @@
             <td>滞留人员类型</td>
             <td>{{info.detainedPersonTypeDesc}}</td>
             <td>户籍地</td>
-            <td>{{info.placeAreaCd}}</td>
+            <td>{{info.placeAreaDesc}}</td>
           </tr>
           <tr>
             <td>安置方式</td>
@@ -313,13 +316,13 @@
           </tr>
           <tr>
             <td>经办人</td>
-            <td>{{info.reviewUser}}</td>
+            <td>{{info.submitUser}}</td>
             <td>负责人</td>
             <td>{{info.orderName}}</td>
           </tr>
           <tr>
             <td>审核人</td>
-            <td>{{info.orderName}}</td>
+            <td>{{info.reviewUser}}</td>
             <td>更新时间</td>
             <td>{{info.uptDate}}</td>
           </tr>
@@ -345,7 +348,6 @@
 
 <script>
 import Vue from 'vue'
-
 
 export default {
   name: 'Welcome',
@@ -375,7 +377,7 @@ export default {
         orderName: "",
         areaCd: "",
         bz: "",
-        detainedPersonTypeDesc: '', //滞留类型
+        detainedPersonTypeCd: '', //滞留类型
       },
       form2: {
         detainedName: "",
@@ -390,7 +392,7 @@ export default {
         orderName: "",
         areaCd: "",
         bz: "",
-        detainedPersonTypeDesc: '', //滞留类型
+        detainedPersonTypeCd: '', //滞留类型
       },
 
       types: [{
@@ -437,11 +439,13 @@ export default {
   methods: {
     //修改
     handleUpdate(val) {
-      // console.log(val)
-      if (val.keepStatusCd != 2) {
+      console.log(val)
+      if(val.keepStatusCd !== '2') {
         this.dialogTableVisible1 = true;
+        val.areaCd = parseInt(val.areaCd)
+        val.detainedPersonTypeCd = parseInt(val.detainedPersonTypeCd)
         this.form1 = val
-      } else {
+      }else{
         this.$message('不能修改提交状态的数据');
       }
     },
@@ -497,6 +501,7 @@ export default {
       // console.log(`当前页: ${val}`);
       this.getData();
     },
+
     //详情
     handleClick(id) {
 
@@ -542,8 +547,10 @@ export default {
 
     //新增保存按钮
     saveNew() {
-
       if (this.form2.detainedName != "" && this.form2.cardNumber != "" && this.form2.telephone != "" && this.form2.address != "" && this.form2.resetMode != "") {
+        this.form2.submitUser = this.userInfo.username
+        this.form2.areaCd = this.userInfo.orgIdCode
+        console.log(this.userInfo)
         this.$http({
           url: this.$http.adornUrl('/dataInto/save'),
           method: 'post',
@@ -610,6 +617,7 @@ export default {
       }).then(res => {
         // console.log(res)
         this.areaArr = res.data.data
+        this.areaArr.push({orgId:420101000000,name:'武汉市'})
       })
     },
     //身份证校验
@@ -643,11 +651,16 @@ export default {
       }
 
     },
-
+  },
+  computed:{
+    userInfo(){
+      let user = JSON.parse(JSON.stringify(this.$store.state.user.userInfo))
+      user.orgIdCode = parseInt(user.orgId)
+      return user
+    }
   },
   mounted() {
     this.form = JSON.parse(JSON.stringify(this.form1))
-
   }
 
 }

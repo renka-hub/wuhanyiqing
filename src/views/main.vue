@@ -68,6 +68,7 @@
           params: this.$http.adornParams()
         }).then(({data}) => {
           if (data && data.code === 0) {
+            this.$store.commit('user/updateUserInfo', data.user)
             this.loading = false
             this.userId = data.user.userId
             this.userName = data.user.username
