@@ -15,8 +15,21 @@
     <div class="block">
       <el-button type="primary" @click="getData">查询</el-button>
       <el-button type="primary" @click="dialogTableVisible2 = true">新增</el-button>
-      <el-button type="primary">数据导入</el-button>
-      <el-button type="primary">数据导出</el-button>
+      <!-- <el-button type="primary">数据导入</el-button> -->
+     <el-upload
+        class="upload-demo"
+        action="http://10.192.72.34:8080/wuhanyiqing-api/outsider/excel/import"
+        :headers="{'token':mate.cookie.get('token')}"
+        :on-preview="handlePreview"
+        :on-remove="handleRemove"
+        :before-remove="beforeRemove"
+        :on-success="handleSuccess"
+        multiple
+        :limit="3"
+        :on-exceed="handleExceed">
+  <el-button size="small" type="primary">数据导入</el-button>
+</el-upload>
+      <el-button type="primary" @click="exportData">数据导出</el-button>
       <el-button type="primary" @click="submit">提交</el-button>
     </div>
     <div class="Detail">
@@ -353,6 +366,7 @@ export default {
   name: 'Welcome',
   data() {
     return {
+      mate: Vue,
       value1: '', //填报日期
       valuel: 1, //记录状态
       options: [], //记录状态
@@ -440,12 +454,12 @@ export default {
     //修改
     handleUpdate(val) {
       console.log(val)
-      if(val.keepStatusCd !== '2') {
+      if (val.keepStatusCd !== '2') {
         this.dialogTableVisible1 = true;
         val.areaCd = parseInt(val.areaCd)
         val.detainedPersonTypeCd = parseInt(val.detainedPersonTypeCd)
         this.form1 = val
-      }else{
+      } else {
         this.$message('不能修改提交状态的数据');
       }
     },
@@ -549,7 +563,7 @@ export default {
       if (this.form2.detainedName != "" && this.form2.cardNumber != "" && this.form2.telephone != "" && this.form2.address != "" && this.form2.resetMode != "") {
         // this.form2.submitUser = this.userInfo.username
         // this.form2.areaCd = this.userInfo.orgIdCode
-        console.log(this.userInfo)
+        // console.log(this.userInfo)
         this.$http({
           url: this.$http.adornUrl('/dataInto/save'),
           method: 'post',
@@ -598,6 +612,45 @@ export default {
         })
       }
     },
+    //数据导出
+    exportData() {
+      this.$http({
+        url: this.$http.adornUrl(`/outsider/excel/export`),
+        method: 'get',
+        responseType: 'blob',
+      }).then(res => {
+        console.log(res.data)
+        let blob = new Blob([res.data], {
+          type: "application/vnd.ms-excel"
+        }); // 2.获取请求返回的response对象中的blob 设置文件类型，这里以excel为例
+        let url = window.URL.createObjectURL(blob); // 3.创建一个临时的url指向blob对象
+        // 4.创建url之后可以模拟对此文件对象的一系列操作，例如：预览、下载
+        let a = document.createElement("a");
+        a.href = url;
+        a.download = "滞汉外地人清单.xlsx";
+        a.click();
+        // 5.释放这个临时的对象url
+        window.URL.revokeObjectURL(url);
+      }, err => {
+        resolve(err.response);
+      })
+    },
+    //数据导入
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+    },
+    handlePreview(file) {
+      console.log(file);
+    },
+    handleExceed(files, fileList) {
+      this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+    },
+    beforeRemove(file, fileList) {
+      return this.$confirm(`确定移除 ${file.name}？`);
+    },
+    handleSuccess(){
+      this.$message.success('提交成功');
+    },
     //户籍
     getCity() {
       this.$http({
@@ -616,7 +669,7 @@ export default {
       }).then(res => {
         // console.log(res)
         this.areaArr = res.data.data
-        this.areaArr.push({orgId:420101000000,name:'武汉市'})
+        this.areaArr.push({ orgId: 420101000000, name: '武汉市' })
       })
     },
     //身份证校验
@@ -651,8 +704,8 @@ export default {
 
     },
   },
-  computed:{
-    userInfo(){
+  computed: {
+    userInfo() {
       let user = JSON.parse(JSON.stringify(this.$store.state.user.userInfo))
       user.orgIdCode = parseInt(user.orgId)
       return user
@@ -673,7 +726,18 @@ export default {
 .welcome-root .block {
   display: inline-block;
   margin-left: 30px;
+  .upload-demo {
+    display: inline-block;
+    .el-button {
+      height: 36px;
+      margin: 0 10px;
+    }
+    /deep/ .el-upload-list{
+       display: none !important;
+    }
+  }
 }
+
 .el-date-editor.el-input,
 .el-date-editor.el-input__inner {
   width: 160px;
