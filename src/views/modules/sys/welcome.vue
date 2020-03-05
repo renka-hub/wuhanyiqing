@@ -242,7 +242,7 @@
             <tr>
               <td>行政区</td>
               <td colspan="4">
-                <el-select v-model="form2.areaDesc" placeholder="请选择">
+                <el-select v-model="form2.areaCd" placeholder="请选择">
                   <el-option v-for="item in areaArr" :key="item.orgId" :label="item.name" :value="item.orgId">
                   </el-option>
                 </el-select>
