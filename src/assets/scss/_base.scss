@@ -9,7 +9,8 @@ body {
   line-height: 1.15;
   color: #303133;
   background-color: #fff;
-  min-width: 1420px;
+  /*min-width: 1420px;*/
+  width:100%;
 }
 a {
   color: mix(#fff, $--color-primary, 20%);
