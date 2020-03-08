@@ -453,7 +453,7 @@ export default {
   methods: {
     //修改
     handleUpdate(val) {
-      console.log(val)
+      // console.log(val)
       if (val.keepStatusCd !== '2') {
         this.dialogTableVisible1 = true;
         val.areaCd = parseInt(val.areaCd)
@@ -499,7 +499,7 @@ export default {
         url: this.$http.adornUrl(`/dataInto/pageList?keepStatusCd=${this.valuel}&submitDate=${this.value1}&pageIndex=${this.pageIndex}&pageSize=${this.pageSize}`),
         method: 'get',
       }).then(res => {
-        console.log(res)
+        // console.log(res)
         this.tableData = res.data.page.list;
         this.pageSize = res.data.page.pageSize
         this.totalCount = res.data.page.totalCount
@@ -532,7 +532,7 @@ export default {
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
-      console.log(this.multipleSelection)
+      // console.log(this.multipleSelection)
     },
     ///修改保存按钮
     saveChange() {
@@ -619,7 +619,7 @@ export default {
         method: 'get',
         responseType: 'blob',
       }).then(res => {
-        console.log(res.data)
+        // console.log(res.data)
         let blob = new Blob([res.data], {
           type: "application/vnd.ms-excel"
         }); // 2.获取请求返回的response对象中的blob 设置文件类型，这里以excel为例
@@ -637,10 +637,10 @@ export default {
     },
     //数据导入
     handleRemove(file, fileList) {
-      console.log(file, fileList);
+      // console.log(file, fileList);
     },
     handlePreview(file) {
-      console.log(file);
+      // console.log(file);
     },
     handleExceed(files, fileList) {
       this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);

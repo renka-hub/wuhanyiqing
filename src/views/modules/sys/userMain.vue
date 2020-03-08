@@ -224,7 +224,6 @@ export default {
     },
     //详情
     toDetail(id) {
-      console.log(id)
       this.$http({
         url: this.$http.adornUrl('/dataInto/info/' + id),
         method: 'get',
