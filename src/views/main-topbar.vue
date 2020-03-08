@@ -8,7 +8,7 @@
         </h1>
       </el-col>
       <el-col :span="14">
-        <main-topbar-menu :data="menuList" :dynamicMenuRoutes="dynamicMenuRoutes"></main-topbar-menu>
+        <main-topbar-menu :nav="navIndex" :data="menuList" :dynamicMenuRoutes="dynamicMenuRoutes"></main-topbar-menu>
       </el-col>
       <el-col :span="4">
         <el-menu
@@ -47,7 +47,8 @@
     data () {
       return {
         dynamicMenuRoutes: [],
-        updatePassowrdVisible: false
+        updatePassowrdVisible: false,
+        navIndex:''
       }
     },
     components: {
@@ -143,7 +144,42 @@
           this.menuActiveName = tab.menuId + ''
           this.mainTabsActiveName = tab.name
         }
-      }
+        this.navIndex = this.getActiveTab(route.meta.menuId)
+      },
+      //
+      getActiveTab:function(idx){
+        let url = idx || location.href
+        let fn = null
+        if(idx){
+          fn = function(url, n){
+            return url == n.menuId
+          }
+        }else if(url.indexOf('#/i-')>-1){
+          fn = function(url, n){
+            return url.endsWith('i-'+n.menuId)
+          }
+        }else{
+          fn = function(url, n){
+            return url.indexOf(n.url) > -1
+          }
+        }
+        let data = this.menuList
+        for (let index = 0; index<data.length; index++) {
+          let nd = data[index];
+          if (nd.url && fn(url, nd)) {
+            return nd.menuId.toString();
+          }
+          if(nd.list){
+            for(let j = 0; j < nd.list.length; j++){
+              let sn = nd.list[j];
+              if(sn.url && fn(url, sn)){
+                return sn.menuId.toString();
+              }
+            }
+          }
+        }
+        return '';
+      },
     }
   }
 </script>
