@@ -12,6 +12,11 @@
 
 <script>
   export default {
+    mounted(){
+      setTimeout(()=>{
+        this.$router.push({ name: 'i-47' })
+      },200)
+    }
   }
 </script>
 

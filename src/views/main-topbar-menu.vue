@@ -63,6 +63,10 @@
     height:50px;
     line-height:50px;
   }
+  /deep/.el-menu--horizontal>.el-menu-item{
+    height:50px;
+    line-height:50px;
+  }
   .el-menu--horizontal {
     border-right: none;
     border-bottom: solid 0px rgb(23, 179, 163) !important;

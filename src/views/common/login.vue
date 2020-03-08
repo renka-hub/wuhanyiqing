@@ -81,7 +81,7 @@
                         }).then(({data}) => {
                             if (data && data.code === 0) {
                                 this.$cookie.set('token', data.token)
-                                this.$router.replace({ name: 'sys-yqdata' })
+                                this.$router.replace({ name: 'home' })
                                 // this.$message.success("登录成功")
                             } else {
                                 // this.getCaptcha()
