@@ -24,7 +24,7 @@
         <el-card :body-style="siteContentViewHeight">
           <iframe
             v-if="item.type === 'iframe'"
-            :src="item.iframeUrl"
+            :src="getUrl(item)"
             width="100%" height="100%" frameborder="0" scrolling="yes">
           </iframe>
           <keep-alive v-else>
@@ -118,6 +118,18 @@
         this.$nextTick(() => {
           this.$router.push({ name: tempTabName })
         })
+      },
+      getUserName(){
+        try{
+          return this.$store.state.user.name
+        }catch(e){
+          return 'wh_admin'
+        }
+      },
+      getUrl(item){
+        let fix = item.iframeUrl.indexOf('?') > -1  ? '&' : '?'
+        let url = item.iframeUrl + fix + 'user=' + this.getUserName()
+        return url
       }
     }
   }
