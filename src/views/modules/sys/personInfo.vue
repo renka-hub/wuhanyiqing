@@ -4,9 +4,13 @@
     <div class="block">
       <el-button type="primary" @click="getData">查询</el-button>
       <el-button type="primary" @click="dialogTableVisible2 = true">新增</el-button>
-      <el-upload class="upload-demo" action="http://10.192.72.34:8080/wuhanyiqing-api/leaveperson/excel/import" :headers="{'token':mate.cookie.get('token')}" :on-preview="handlePreview" :before-upload="beforeUpload" :data="uploadData" :on-remove="handleRemove" :before-remove="beforeRemove" :on-success="handleSuccess" multiple :limit="3" :on-exceed="handleExceed">
+      <!-- <el-upload class="upload-demo" action="http://10.192.72.34:8080/wuhanyiqing-api/leaveperson/excel/import" :headers="{'token':mate.cookie.get('token')}" :on-preview="handlePreview" :before-upload="beforeUpload" :data="uploadData" :on-remove="handleRemove" :before-remove="beforeRemove" :on-success="handleSuccess" multiple :limit="3" :on-exceed="handleExceed">
         <el-button size="small" type="primary">数据导入</el-button>
+      </el-upload> -->
+      <el-upload class="upload-demo" action :limit="1" :file-list="formFileList" :http-request="handleUploadForm" accept=".csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
+        <el-button type="primary">数据导入</el-button>
       </el-upload>
+
       <!-- <el-button type="primary" @click="exportData">数据导出</el-button> -->
       <el-button type="primary" @click="temDownload">模板下载</el-button>
     </div>
@@ -72,7 +76,15 @@
     <div class="Detail">
       <p class="DetailTab">已离汉人员信息表</p>
       <el-table ref="multipleTable" :data="tableData" tooltip-effect="dark" border style="width: 100%" @selection-change="handleSelectionChange">
-        <el-table-column prop="id" label="序号">
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <el-button @click="deleteClick(scope.row.id)" type="text" size="small">删除</el-button>
+            <el-button type="text" size="small" @click="handleUpdate(scope.row)">修改</el-button>
+          </template>
+        </el-table-column>
+        <el-table-column type="index" :index="indexMethod" label="序号" header-align="center" align="center" width="100">
+        </el-table-column>
+        <!-- <el-table-column prop="id" label="序号">
         </el-table-column> -->
         <el-table-column prop="name" label="姓名">
         </el-table-column>
@@ -123,7 +135,7 @@
           <el-input v-model="form2.cardNum" v-show="form2.cardType!='中华人民共和国居民身份证'"></el-input>
         </el-form-item>
 
-        <el-form-item label="户籍地">
+        <el-form-item label="户籍地" prop="hj">
           <el-input v-model="form2.hj" placeholder="请输入内容" size="small "></el-input>
         </el-form-item>
         <el-form-item label="滞汉居住方式" prop="levLiveType">
@@ -156,6 +168,64 @@
         <div class="dialog-footer" style="text-align: right;">
           <el-button type="primary" @click="saveNew('form2')">保存</el-button>
           <el-button @click="dialogTableVisible2 = false">放弃</el-button>
+        </div>
+      </el-form>
+    </el-dialog>
+    <!-- 修改弹框 -->
+    <el-dialog title="修改" :visible.sync="dialogTableVisible1">
+      <el-form :model="form1" :rules="rules" ref="form1">
+
+        <el-form-item label="姓名：" prop="name">
+          <el-input v-model="form1.name" placeholder="请输入内容" size="small "></el-input>
+        </el-form-item>
+        <el-form-item label="手机：" prop="phone">
+          <el-input v-model="form1.phone" placeholder="请输入内容" size="small "></el-input>
+        </el-form-item>
+
+        <el-form-item label="证件类型" prop="cardType">
+          <el-select v-model="form1.cardType" placeholder="请选择">
+            <el-option v-for="item in types" :key="item.label" :label="item.label" :value="item.label">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="证件号码" prop="cardNum">
+          <el-input v-model="form1.cardNum" @blur="checkIdCard(form1.cardNum)" v-show="form1.cardType=='中华人民共和国居民身份证'"></el-input>
+          <el-input v-model="form1.cardNum" v-show="form1.cardType!='中华人民共和国居民身份证'"></el-input>
+        </el-form-item>
+
+        <el-form-item label="户籍地">
+          <el-input v-model="form1.hj" placeholder="请输入内容" size="small "></el-input>
+        </el-form-item>
+        <el-form-item label="滞汉居住方式" prop="levLiveType">
+          <!-- <el-input v-model="form1.backCity" placeholder="请输入内容" size="small "></el-input> -->
+          <el-select v-model="form1.levLiveType" placeholder="请选择">
+            <el-option v-for="item in levLiveType" :key="item.value" :label="item.value" :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="滞汉居住地址" prop="levLiveAddress">
+          <el-input v-model="form1.levLiveAddress" placeholder="请输入内容" size="small "></el-input>
+        </el-form-item>
+        <el-form-item label="返回省份" prop="backProvince">
+          <el-input v-model="form1.backProvince" placeholder="请输入内容" size="small "></el-input>
+        </el-form-item>
+        <el-form-item label="返回市" prop="backCity">
+          <el-input v-model="form1.backCity" placeholder="请输入内容" size="small "></el-input>
+        </el-form-item>
+        <el-form-item label="离汉时间" prop="levTime">
+          <el-date-picker v-model="form1.levTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期"></el-date-picker>
+        </el-form-item>
+
+        <el-form-item label="返程方式" prop="levBy">
+          <el-select v-model="form1.levBy" placeholder="请选择">
+            <el-option v-for="item in levBy" :key="item.label" :label="item.label" :value="item.label">
+            </el-option>
+          </el-select>
+        </el-form-item>
+
+        <div class="dialog-footer" style="text-align: right;">
+          <el-button type="primary" @click="saveChange('form1')">保存</el-button>
+          <el-button @click="dialogTableVisible1 = false">放弃</el-button>
         </div>
       </el-form>
 
@@ -262,6 +332,9 @@ export default {
           { required: true, message: '请输入证件号码', trigger: 'blur' },
           // { pattern: /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/, message: '证件号码错误' }
         ],
+        hj: [
+          { required: true, message: '请输入户籍地', trigger: 'blur' },
+        ],
         levTime: [
           { required: true, message: '请选择离汉时间', trigger: 'blur' },
         ],
@@ -297,11 +370,13 @@ export default {
         zoneCd: ""
       },
       dialogTableVisible2: false, //新增
+      dialogTableVisible1: false, //修改
       currentPage: 1, //页数
       pageSize: 20, //条数
       pageIndex: 1, //页码
       totalCount: 0,
       uploadData: null,
+      formFileList: [], // 显示上传文件
     }
   },
   created() {
@@ -324,6 +399,7 @@ export default {
         this.tableData = res.data.page.list;
         this.pageSize = res.data.page.pageSize
         this.totalCount = res.data.page.totalCount
+        this.currentPage = res.data.page.currPage
         this.search1 = { brand_right: 0 }
       })
     },
@@ -424,28 +500,59 @@ export default {
       })
     },
     //数据导入
-    handleRemove(file, fileList) {
-      console.log(file, fileList);
-    },
-    handlePreview(file) {
-      console.log(file);
-    },
-    handleExceed(files, fileList) {
-      this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
-    },
-    beforeRemove(file, fileList) {
-      return this.$confirm(`确定移除 ${file.name}？`);
-    },
-    handleSuccess(res) {
-      // console.log(res);
-      this.$message.info(res.msg);
-    },
-    beforeUpload(file) {
+    // handleRemove(file, fileList) {
+    //   console.log(file, fileList);
+    // },
+    // handlePreview(file) {
+    //   console.log(file);
+    // },
+    // handleExceed(files, fileList) {
+    //   this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+    // },
+    // beforeRemove(file, fileList) {
+    //   return this.$confirm(`确定移除 ${file.name}？`);
+    // },
+    // handleSuccess(res) {
+    //   // console.log(res);
+    //   this.$message.info(res.msg);
+    //   this.getData();
+    // },
+    // beforeUpload(file) {
+    //   this.uploadData = { username: this.userInfo.username };
+    // },
 
-      this.uploadData = { username: this.userInfo.username };
+    // 上传文件
+    handleUploadForm(param) {
+      let thiz = this
+      // let formData = new FormData()
+      // formData.append('username', 'this.userInfo.username') // 额外参数
+      // formData.append('files', param.file)
+      let loading = thiz.$loading({
+        lock: true,
+        text: '上传中，请稍候...',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
+      this.$http({
+        url: this.$http.adornUrl('/leaveperson/excel/import'),
+        method: 'post',
+        data: this.$http.adornData({
+          'username': this.userInfo.username,
+        })
+      }).then(data => {
+        // if (data.statusCode === 233) {
+        //      thiz.$message('上传文件成功，' + data.message)
+        //      thiz.formFileList = []
+        //      thiz.uploadFormFileList = []
+        //     } else {
+        //      thiz.formFileList = []
+        //      thiz.uploadFormFileList = []
+        //      thiz.$message('上传文件失败，' + data.message)
+        //     }
+        loading.close()
+      })
 
     },
-
     //身份证校验
     checkIdCard(idcard) {
       const regIdCard = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
@@ -457,16 +564,79 @@ export default {
       }
     },
 
-    // //手机号校验
-    // phoneNumber(phone) {
-    //   const regPhone = /^[1][3,4,5,7,8,9][0-9]{9}$/;
-    //   if (!regPhone.test(phone)) {
-    //     this.$message.error('手机号填写有误');
-    //     return false;
-    //   } else {
-    //     return true;
-    //   }
-    // },
+    //修改
+    handleUpdate(val) {
+      // console.log(val)
+      this.dialogTableVisible1 = true;
+      this.form1 = val
+
+    },
+    ///修改保存按钮
+    saveChange(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.form1.zoneCd = this.userInfo.username
+          this.$http({
+            url: this.$http.adornUrl('/levPerson/update'),
+            method: 'post',
+            data: this.$http.adornData(this.form1)
+          }).then(res => {
+            // console.log(res)
+            if (!res.data.code) {
+              this.$message({
+                message: '修改成功',
+                type: 'success'
+              });
+              this.dialogTableVisible1 = false
+              this.form1 = JSON.parse(JSON.stringify(this.form))
+              this.getData();
+            } else {
+              this.$message({
+                message: '修改失败',
+                type: 'error'
+              });
+            }
+          })
+        } else {
+          console.log('error submit!!');
+          return false;
+        }
+      });
+    },
+    //删除
+    deleteClick(id) {
+      this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$http({
+          url: this.$http.adornUrl(`/levPerson/updateStatus/${id}`),
+          method: 'post',
+        }).then(res => {
+          if (!res.data.code) {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            });
+            this.getData();
+          }
+        })
+
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
+
+
+
+
+    },
+    indexMethod(index) {
+      return (index + 1) + (this.currentPage - 1) * (this.pageSize)
+    }
 
   },
   computed: {

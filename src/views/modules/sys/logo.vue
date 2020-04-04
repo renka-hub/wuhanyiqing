@@ -21,7 +21,9 @@
     <div class="Detail">
       <!-- <p class="DetailTab">登录日志</p> -->
       <el-table ref="multipleTable" :data="tableData" tooltip-effect="dark" border style="width: 100%" @selection-change="handleSelectionChange">
-        <el-table-column prop="id" label="序号" width="100">
+        <el-table-column type="index" :index="indexMethod" label="序号" header-align="center" align="center" width="100">
+        </el-table-column>
+        <!-- <el-table-column prop="id" label="序号" width="100">
         </el-table-column> -->
         <el-table-column prop="user" label="用户名">
         </el-table-column>
@@ -72,10 +74,11 @@ export default {
         url: this.$http.adornUrl(`/operate/log/pageList?userName=${this.user}&time=${this.time}&type=${this.type}&pageIndex=${this.pageIndex}&pageSize=${this.pageSize}`),
         method: 'get',
       }).then(res => {
-        console.log(res)
+        // console.log(res)
         this.tableData = res.data.page.list;
         this.pageSize = res.data.page.pageSize
         this.totalCount = res.data.page.totalCount
+        this.currentPage= res.data.page.currPage
 
       })
     },
@@ -94,6 +97,9 @@ export default {
       this.multipleSelection = val;
       // console.log(this.multipleSelection)
     },
+    indexMethod(index) {
+      return (index + 1) + (this.currentPage - 1) * (this.pageSize)
+    }
 
   },
   computed: {
