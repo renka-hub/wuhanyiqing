@@ -4,7 +4,7 @@
     <div class="block">
       <el-button type="primary" @click="getData">查询</el-button>
       <el-button type="primary" @click="dialogTableVisible2 = true">新增</el-button>
-      <el-upload class="upload-demo" action="http://10.192.72.34:8080/wuhanyiqing-api/leaveperson/excel/import" :headers="{'token':mate.cookie.get('token')}" :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" :on-success="handleSuccess" multiple :limit="3" :on-exceed="handleExceed">
+      <el-upload class="upload-demo" action="http://10.192.72.34:8080/wuhanyiqing-api/leaveperson/excel/import" :headers="{'token':mate.cookie.get('token')}" :on-preview="handlePreview" :before-upload="beforeUpload" :data="uploadData" :on-remove="handleRemove" :before-remove="beforeRemove" :on-success="handleSuccess" multiple :limit="3" :on-exceed="handleExceed">
         <el-button size="small" type="primary">数据导入</el-button>
       </el-upload>
       <!-- <el-button type="primary" @click="exportData">数据导出</el-button> -->
@@ -301,6 +301,7 @@ export default {
       pageSize: 20, //条数
       pageIndex: 1, //页码
       totalCount: 0,
+      uploadData: null,
     }
   },
   created() {
@@ -313,9 +314,9 @@ export default {
 
     // 获取数据
     getData() {
+      this.search1.zoneCd = this.userInfo.username
       this.$http({
         url: this.$http.adornUrl(`/levPerson/pageList`),
-
         method: 'post',
         data: this.$http.adornData(this.search1)
       }).then(res => {
@@ -436,8 +437,13 @@ export default {
       return this.$confirm(`确定移除 ${file.name}？`);
     },
     handleSuccess(res) {
-      console.log(res);
-      this.$message.success('提交成功');
+      // console.log(res);
+      this.$message.info(res.msg);
+    },
+    beforeUpload(file) {
+
+      this.uploadData = { username: this.userInfo.username };
+
     },
 
     //身份证校验
@@ -565,10 +571,11 @@ export default {
       display: inline-block;
       text-align: right;
     }
-    .el-input,.el-select {
+    .el-input,
+    .el-select {
       width: 65%;
     }
-    .el-date-editor{
+    .el-date-editor {
       width: 62%;
     }
   }

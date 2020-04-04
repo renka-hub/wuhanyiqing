@@ -1,24 +1,24 @@
 <template>
   <nav class="site-navbar" :class="'site-navbar--' + navbarLayoutType">
     <el-row>
-      <el-col :span="6">
+      <el-col :span="5">
         <h1 class="site-navbar__brand" @click="$router.push({ name: 'home' })">
           <a class="site-navbar__brand-lg" href="javascript:;">武汉市滞汉外地人员信息上报平台</a>
           <!--<a class="site-navbar__brand-mini" href="javascript:;">金信</a>-->
         </h1>
       </el-col>
-      <el-col :span="14">
+      <el-col :span="16">
         <main-topbar-menu :nav="navIndex" :data="menuList" :dynamicMenuRoutes="dynamicMenuRoutes"></main-topbar-menu>
       </el-col>
-      <el-col :span="4">
+      <el-col :span="3">
         <el-menu
                 class="site-navbar__menu site-navbar__menu--right"
                 mode="horizontal">
-          <el-menu-item index="1" @click="$router.push({ name: 'theme' })">
+          <!-- <el-menu-item index="1" @click="$router.push({ name: 'theme' })">
             <template slot="title">
               <icon-svg name="shezhi" class="el-icon-setting"></icon-svg>
             </template>
-          </el-menu-item>
+          </el-menu-item> -->
           <el-menu-item class="site-navbar__avatar" index="3">
             <el-dropdown :show-timeout="0" placement="bottom">
             <span class="el-dropdown-link">
@@ -192,5 +192,8 @@
   }
   .el-menu--horizontal>.el-menu-item{
     color:#fff;
+  }
+  .site-navbar__brand-lg{
+    font-size: 18px;
   }
 </style>
