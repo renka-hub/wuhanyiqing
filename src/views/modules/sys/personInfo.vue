@@ -4,13 +4,9 @@
     <div class="block">
       <el-button type="primary" @click="getData">查询</el-button>
       <el-button type="primary" @click="dialogTableVisible2 = true">新增</el-button>
-      <!-- <el-upload class="upload-demo" action="http://10.192.72.34:8080/wuhanyiqing-api/leaveperson/excel/import" :headers="{'token':mate.cookie.get('token')}" :on-preview="handlePreview" :before-upload="beforeUpload" :data="uploadData" :on-remove="handleRemove" :before-remove="beforeRemove" :on-success="handleSuccess" multiple :limit="3" :on-exceed="handleExceed">
+      <el-upload class="upload-demo" action="http://10.192.72.34:8080/wuhanyiqing-api/leaveperson/excel/import" :headers="{'token':mate.cookie.get('token')}" :on-preview="handlePreview" :before-upload="beforeUpload" :data="uploadData" :on-remove="handleRemove" :before-remove="beforeRemove" :on-success="handleSuccess" multiple :limit="3" :on-exceed="handleExceed">
         <el-button size="small" type="primary">数据导入</el-button>
-      </el-upload> -->
-      <el-upload class="upload-demo" action :limit="1" :file-list="formFileList" :http-request="handleUploadForm" accept=".csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
-        <el-button type="primary">数据导入</el-button>
       </el-upload>
-
       <!-- <el-button type="primary" @click="exportData">数据导出</el-button> -->
       <el-button type="primary" @click="temDownload">模板下载</el-button>
     </div>
@@ -375,8 +371,9 @@ export default {
       pageSize: 20, //条数
       pageIndex: 1, //页码
       totalCount: 0,
-      uploadData: null,
-      formFileList: [], // 显示上传文件
+      uploadData: {
+        username: "",
+      },
     }
   },
   created() {
@@ -500,59 +497,29 @@ export default {
       })
     },
     //数据导入
-    // handleRemove(file, fileList) {
-    //   console.log(file, fileList);
-    // },
-    // handlePreview(file) {
-    //   console.log(file);
-    // },
-    // handleExceed(files, fileList) {
-    //   this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
-    // },
-    // beforeRemove(file, fileList) {
-    //   return this.$confirm(`确定移除 ${file.name}？`);
-    // },
-    // handleSuccess(res) {
-    //   // console.log(res);
-    //   this.$message.info(res.msg);
-    //   this.getData();
-    // },
-    // beforeUpload(file) {
-    //   this.uploadData = { username: this.userInfo.username };
-    // },
-
-    // 上传文件
-    handleUploadForm(param) {
-      let thiz = this
-      // let formData = new FormData()
-      // formData.append('username', 'this.userInfo.username') // 额外参数
-      // formData.append('files', param.file)
-      let loading = thiz.$loading({
-        lock: true,
-        text: '上传中，请稍候...',
-        spinner: 'el-icon-loading',
-        background: 'rgba(0, 0, 0, 0.7)'
-      })
-      this.$http({
-        url: this.$http.adornUrl('/leaveperson/excel/import'),
-        method: 'post',
-        data: this.$http.adornData({
-          'username': this.userInfo.username,
-        })
-      }).then(data => {
-        // if (data.statusCode === 233) {
-        //      thiz.$message('上传文件成功，' + data.message)
-        //      thiz.formFileList = []
-        //      thiz.uploadFormFileList = []
-        //     } else {
-        //      thiz.formFileList = []
-        //      thiz.uploadFormFileList = []
-        //      thiz.$message('上传文件失败，' + data.message)
-        //     }
-        loading.close()
-      })
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+    },
+    handlePreview(file) {
+      console.log(file);
+    },
+    handleExceed(files, fileList) {
+      this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+    },
+    beforeRemove(file, fileList) {
+      return this.$confirm(`确定移除 ${file.name}？`);
+    },
+    handleSuccess(res) {
+      // console.log(res);
+      this.$message.info(res.msg);
+      this.getData();
 
     },
+    beforeUpload(file) {
+      const _vm = this;
+      _vm.uploadData.username = this.userInfo.username ;
+    },
+
     //身份证校验
     checkIdCard(idcard) {
       const regIdCard = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
